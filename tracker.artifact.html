@@ -1,0 +1,487 @@
+<title>Procreate 練習台</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --ground:#eef0ef; --surface:#fbfbfa; --surface-2:#e6e9e8;
+    --ink:#1a1d1c; --ink-2:#4a514f; --ink-3:#79817f;
+    --line:#d3d8d6; --line-strong:#b6bdba;
+    --accent:#1c6b63; --accent-soft:#d3e4e1; --accent-ink:#0e4b45;
+    --mark:#a8442a;
+    --shadow:0 1px 2px rgba(20,30,28,.06), 0 8px 24px -16px rgba(20,30,28,.35);
+    --serif:"Noto Serif TC","Songti TC",Georgia,serif;
+    --sans:"Noto Sans TC","PingFang TC","Hiragino Sans",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#151817; --surface:#1d2221; --surface-2:#262c2b;
+      --ink:#e8ebea; --ink-2:#aab3b1; --ink-3:#7d8785;
+      --line:#313836; --line-strong:#454d4b;
+      --accent:#59b3a8; --accent-soft:#22403c; --accent-ink:#8fd3ca;
+      --mark:#d9825f;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#151817; --surface:#1d2221; --surface-2:#262c2b;
+    --ink:#e8ebea; --ink-2:#aab3b1; --ink-3:#7d8785;
+    --line:#313836; --line-strong:#454d4b;
+    --accent:#59b3a8; --accent-soft:#22403c; --accent-ink:#8fd3ca;
+    --mark:#d9825f;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+
+  *{box-sizing:border-box}
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);line-height:1.65;
+       -webkit-text-size-adjust:100%}
+  .wrap{max-width:760px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+  h1,h2,h3{font-family:var(--serif);text-wrap:balance;margin:0}
+  a{color:var(--accent-ink)}
+  button{font:inherit;color:inherit}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+
+  /* ---- masthead ---- */
+  header{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between;
+         padding-bottom:18px;border-bottom:2px solid var(--ink);margin-bottom:26px}
+  header h1{font-size:30px;line-height:1.2;letter-spacing:.01em}
+  header p{margin:4px 0 0;color:var(--ink-2);font-size:13.5px}
+  .stats{display:flex;gap:22px;font-variant-numeric:tabular-nums}
+  .stat b{display:block;font-family:var(--serif);font-size:26px;line-height:1.1}
+  .stat span{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--ink-3);text-transform:uppercase}
+
+  /* ---- today ---- */
+  .today{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);
+         border-radius:3px;box-shadow:var(--shadow);padding:22px 22px 20px;margin-bottom:34px}
+  .today-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-bottom:14px}
+  .today-head h2{font-size:20px}
+  .chip{font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:2px;
+        background:var(--accent-soft);color:var(--accent-ink);letter-spacing:.06em}
+  .task{font-size:17px;font-weight:500;margin:0 0 4px}
+  .task-meta{color:var(--ink-2);font-size:13.5px;margin:0}
+  .warmup{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line-strong);
+          font-size:13px;color:var(--ink-2)}
+  .warmup b{color:var(--ink);font-weight:500}
+  .focus{margin-top:16px}
+  .focus label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;
+               text-transform:uppercase;color:var(--ink-3);margin-bottom:6px}
+  .focus input{width:100%;padding:9px 11px;border:1px solid var(--line-strong);border-radius:2px;
+               background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:14px}
+  .focus input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  .done-btn{margin-top:16px;width:100%;padding:12px;border:1px solid var(--accent);border-radius:2px;
+            background:var(--accent);color:#fff;font-weight:500;font-size:15px;cursor:pointer;
+            transition:filter .15s}
+  .done-btn:hover{filter:brightness(1.08)}
+  .done-btn[aria-pressed="true"]{background:transparent;color:var(--accent-ink);
+            border-style:dashed}
+  .done-btn:focus-visible{outline:2px solid var(--mark);outline-offset:2px}
+
+  /* ---- grid ---- */
+  section{margin-bottom:34px}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+            border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:16px}
+  .sec-head h2{font-size:17px}
+  .phase{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--ink-3);
+         text-transform:uppercase;margin:20px 0 8px}
+  .phase:first-of-type{margin-top:0}
+  .wk{display:grid;grid-template-columns:30px 1fr auto;gap:12px;align-items:center;
+      padding:7px 0;border-bottom:1px solid var(--line)}
+  .wk-n{font-family:var(--mono);font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+  .wk-t{font-size:14.5px;min-width:0}
+  .wk.now .wk-n{color:var(--mark);font-weight:500}
+  .wk.now .wk-t{font-weight:500}
+  .dots{display:flex;gap:5px}
+  .dot{width:22px;height:22px;padding:0;border:1px solid var(--line-strong);border-radius:50%;
+       background:transparent;cursor:pointer;transition:background .12s,border-color .12s}
+  .dot[aria-pressed="true"]{background:var(--accent);border-color:var(--accent)}
+  .dot:focus-visible{outline:2px solid var(--mark);outline-offset:2px}
+  .dot.is-today{border-color:var(--mark);border-width:2px}
+
+  /* ---- reference blocks ---- */
+  .ges{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px}
+  .ges div{display:flex;gap:10px;justify-content:space-between;padding:7px 0;
+           border-bottom:1px solid var(--line);font-size:13.5px}
+  .ges dt{color:var(--ink);font-weight:500;white-space:nowrap}
+  .ges dd{margin:0;color:var(--ink-2);text-align:right}
+  .scale{display:flex;border:1px solid var(--line-strong);border-radius:2px;overflow:hidden;margin-top:4px}
+  .scale span{flex:1;height:46px;display:flex;align-items:flex-end;justify-content:center;
+              font-family:var(--mono);font-size:10px;padding-bottom:3px}
+  .note{font-size:12.5px;color:var(--ink-3);margin:8px 0 0}
+  details{border-bottom:1px solid var(--line)}
+  summary{cursor:pointer;padding:9px 0;font-size:14px;font-weight:500;list-style:none;
+          display:flex;justify-content:space-between;gap:12px}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"＋";color:var(--ink-3);font-family:var(--mono)}
+  details[open] summary::after{content:"－"}
+  details p{margin:0 0 12px;font-size:13.5px;color:var(--ink-2)}
+  .drill{display:grid;grid-template-columns:44px 1fr;gap:4px 12px;padding:7px 0;
+         border-bottom:1px solid var(--line);font-size:13.5px}
+  .drill:last-child{border-bottom:none}
+  .drill code{font-family:var(--mono);font-size:12px;color:var(--accent-ink)}
+  .drill em{display:block;font-style:normal;color:var(--ink-2);font-size:12.5px}
+  footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);
+         font-size:12.5px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:8px 16px;
+         justify-content:space-between}
+  .sync{font-family:var(--mono);font-size:11px}
+
+  @media (max-width:520px){
+    header h1{font-size:25px}
+    .wrap{padding-block:22px 48px}
+    .ges{grid-template-columns:1fr}
+    .wk{grid-template-columns:26px 1fr;row-gap:6px}
+    .dots{grid-column:1/-1}
+    .dot{width:32px;height:26px;border-radius:3px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <p class="eyebrow">12 週零基礎課表</p>
+      <h1>Procreate 練習台</h1>
+      <p id="sub">每天 25 分鐘 · 一週練到 4 天就算成功 · 無壓感筆版本</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="s-days">0</b><span>已練天數</span></div>
+      <div class="stat"><b id="s-week">W1</b><span>目前週次</span></div>
+      <div class="stat"><b id="s-streak">0</b><span>本週天數</span></div>
+    </div>
+  </header>
+
+  <div class="today">
+    <div class="today-head">
+      <span class="chip" id="t-chip">W1 D1</span>
+      <h2 id="t-week">線條與工具馴化</h2>
+    </div>
+    <p class="task" id="t-task">D01 線條熱身（直線／曲線）</p>
+    <p class="task-meta" id="t-meta">25 分鐘</p>
+    <div class="warmup" id="warmup"></div>
+    <div class="focus">
+      <label for="focus-input">今天要修正的一件事（不能空著）</label>
+      <input id="focus-input" type="text" placeholder="例：長線改用手肘畫，不用手腕" autocomplete="off">
+    </div>
+    <button class="done-btn" id="done-btn" aria-pressed="false">今天練完了 ✓</button>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <h2>12 週進度</h2>
+      <span class="eyebrow">點一下記錄</span>
+    </div>
+    <div id="weeks"></div>
+    <p class="note">目標是 12 週後還在畫，不是把格子全部塗滿。一週 4 天就算成功。</p>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>手勢速查</h2><span class="eyebrow">前兩週刻意照表操作</span></div>
+    <dl class="ges" id="ges"></dl>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>五階明度尺</h2><span class="eyebrow">W4 起每天對照</span></div>
+    <div class="scale" id="scale"></div>
+    <p class="note">瞇眼看實物，把每一塊歸到這五階之一。多數新手的畫只有兩階（線稿的黑＋紙的白），所以永遠是平的。</p>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>練習庫 D01–D20</h2><span class="eyebrow">課表會指定編號</span></div>
+    <div id="drills"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>卡住的時候</h2><span class="eyebrow">症狀 → 解法</span></div>
+    <div id="fix"></div>
+  </section>
+
+  <footer>
+    <span>起算日 <span id="start-date">2026-09-14</span>　·　完整教材在 repo 的 <code>procreate/</code></span>
+    <span class="sync" id="sync">本機儲存</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var WEEKS = [
+    {n:1,phase:"一・控筆與觀察",t:"線條與工具馴化",
+     d:["D01 線條熱身（直線／曲線）","D01 ＋ StreamLine 實驗（0/25/50/80%）","D02 橢圓與圓柱",
+        "D03 排線與漸層（不透明度 20% 疊塗＋傾斜側鋒）","D01 ＋ D02 混合，用手肘不用手腕","成果圖：20 個不同角度的圓柱體"]},
+    {n:2,phase:"一・控筆與觀察",t:"形狀拆解",
+     d:["D04 盲輪廓（全程不看畫布）","D04 改良版（眼睛 80% 看實物）","四種積木各畫 10 個",
+        "拆解家中 3 樣物件，只用積木","換 3 樣更複雜的再拆一次","成果圖：D05 十分鐘臨摹 × 3"]},
+    {n:3,phase:"一・控筆與觀察",t:"比例與測量",
+     d:["D06 負空間（畫洞不畫椅子）","D06 換題目：腳踏車／衣架","D07 倒置臨摹",
+        "單位測量法","畫完水平翻轉找歪斜並修正","成果圖：桌上靜物純輪廓線"]},
+    {n:4,phase:"一・控筆與觀察",t:"明暗三階　← 進步最有感",
+     d:["D08 五階明度條","D09 球體打光（五個部位）","D09 換圓柱與方塊",
+        "剪切遮罩上陰影，練到不用想","D10 靜物明暗（3 物件單光源）","成果圖：馬克杯黑白完稿"]},
+    {n:5,phase:"二・立體與構圖",t:"一點透視",
+     d:["讀 §透視 ＋ 設定一點透視參考線","D11 一點透視方塊陣","走廊／房間",
+        "房間裡放家具（都是盒子）","關掉輔助繪圖徒手畫一次","成果圖：你所在房間的透視圖"]},
+    {n:6,phase:"二・立體與構圖",t:"兩點透視",
+     d:["D12 兩點透視盒子","D12 進階：盒子疊盒子、挖洞","四種積木放進兩點透視空間",
+        "桌面靜物","街角建築","成果圖：街角速寫含明暗"]},
+    {n:7,phase:"二・立體與構圖",t:"構圖",
+     d:["D13 縮圖構圖 6 連","D14 Notan 三階","構圖分析：拆 3 張喜歡的圖",
+        "D13 換題材再做一次","挑最好的縮圖放大成線稿","成果圖：完成黑白稿"]},
+    {n:8,phase:"二・立體與構圖",t:"質感與筆刷",
+     d:["D15 質感方塊：金屬","D15：木頭、布","D15：玻璃／透明物",
+        "邊緣練習：硬邊／軟邊／混合","混合模式實驗並記錄","成果圖：三材質靜物組合"]},
+    {n:9,phase:"三・顏色與完成度",t:"色彩基礎",
+     d:["讀 §色彩 ＋ 認識 HSB 色圈","明度優先：把彩照轉黑白比對","D16 有限色盤（3 色＋黑白）",
+        "D19 從照片抓色建立色票","D17 平塗＋剪切遮罩流程","成果圖：W4 的杯子上色版，限 4 色"]},
+    {n:10,phase:"三・顏色與完成度",t:"光與色",
+     d:["光源色：暖光／冷光各畫一次","環境光與反射光","陰影的顏色（降飽和偏冷）",
+        "正片疊底陰影層＋濾色光暈","逆光：剪影＋邊緣光","成果圖：有光氣氛的小場景"]},
+    {n:11,phase:"三・顏色與完成度",t:"完整流程（只畫一張圖）",
+     d:["D13 縮圖 6 張，選 1 張","放大成草稿","線稿（Studio Pen）",
+        "平塗底色（ColorDrop）","陰影＋高光（剪切遮罩）","收尾：調整層、邊緣、簽名"]},
+    {n:12,phase:"三・顏色與完成度",t:"個人題目與複盤",
+     d:["重畫 W1 D6 的圓柱體","重畫 W2 D6 的臨摹題材","新舊並排，寫下 5 個具體差異",
+        "自選題目：走完整流程","自選題目：續","自選題目：完稿"]}
+  ];
+
+  var GESTURES = [
+    ["兩指點","復原"],["三指點","重做"],["兩指按住","連續復原"],["按住畫布","滴管取色"],
+    ["三指來回擦","清除圖層"],["三指下滑","拷貝與貼上"],["畫完停住不放","速創形狀"],
+    ["拖曳顏色圓圈","色彩快填"],["兩指往右滑圖層","Alpha 鎖定"],["兩指捏合圖層","合併"],
+    ["四指點","全螢幕"],["快速捏合","縮放至螢幕"]
+  ];
+
+  var DRILLS = [
+    ["D01","線條熱身","直線、曲線、兩點連線。眼睛看終點不看筆尖"],
+    ["D02","橢圓與圓柱","空中先繞 5 圈再落筆，一筆完成"],
+    ["D03","排線與漸層","線距與壓力兩種做法，漸層要連續"],
+    ["D04","盲輪廓","全程不看畫布。觀念上最重要的練習"],
+    ["D05","十分鐘臨摹","同張照片 10→8→6 分鐘各畫一次"],
+    ["D06","負空間","只畫洞，比例問題的解藥"],
+    ["D07","倒置臨摹","參考照轉 180°，繞過符號系統"],
+    ["D08","五階明度條","先在眼睛裡建立明度刻度"],
+    ["D09","球體打光","亮面／中間調／暗面／反射光／投影，缺一不可"],
+    ["D10","靜物明暗","單一檯燈光源，先瞇眼分三階大塊鋪"],
+    ["D11","一點透視方塊陣","消失點上下左右各 5 個盒子"],
+    ["D12","兩點透視盒子","消失點拉遠，否則變魚眼"],
+    ["D13","縮圖構圖 6 連","每格 2 分鐘，只准黑白塊面"],
+    ["D14","Notan 三階","縮小後主題仍清楚 = 明度結構成立"],
+    ["D15","質感方塊","質感靠明暗分布與邊緣軟硬，不靠筆刷"],
+    ["D16","有限色盤","3 色＋黑白，逼你用明度與飽和度變化"],
+    ["D17","平塗＋剪切遮罩","標準數位上色流水線"],
+    ["D18","30 秒姿態速寫","只畫動勢線，不畫臉與手指"],
+    ["D19","從照片抓色","真實顏色比你以為的濁得多"],
+    ["D20","重畫舊作","每 3 個月一次，唯一可靠的進步證據"]
+  ];
+
+  var FIXES = [
+    ["線條抖、毛毛的","用手肘不用手腕、畫快一點、一筆到底。StreamLine 10–25%，不要超過 40%。→ D01"],
+    ["畫出來像小學生的圖","這是「符號畫」：大腦用概念取代觀察。→ D04 盲輪廓、D07 倒置臨摹"],
+    ["比例總是歪","靠感覺沒在量。用單位測量法，畫完一定水平翻轉檢查。→ D06"],
+    ["看起來很平、沒立體感","明度只有兩階，而且通常漏掉反射光與投影。→ D08、D09"],
+    ["顏色很髒","飽和度全拉滿、色相太多、陰影用純黑調暗。→ D16，陰影改成降飽和偏冷"],
+    ["細節畫很久還是不好看","太早進細節。順序永遠是大形 → 中形 → 細節，草稿階段用大筆刷"],
+    ["不敢下第一筆","先畫 6 張 2 分鐘的爛縮圖。爛稿是流程的一部分。→ D13"],
+    ["覺得自己在退步","眼睛比手先進步，這是進步的訊號。拿 4 週前的圖比一次。→ D20"],
+    ["一直想買筆刷包","逃避練習的高級形式。12 週內不買任何素材，瓶頸不在工具"],
+    ["斷了幾天不想回來","不用補課，直接從當天進度接回去。連續性是指習慣，不是紀錄"]
+  ];
+
+  var START = "2026-09-14";
+  var LS = "procreate-tracker-v1";
+  var state = {startDate:START, done:{}, focus:{}};
+  var db = null, docRef = null;
+
+  function todayKey(){
+    var d = new Date();
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  }
+  function position(){
+    var s = new Date(state.startDate+"T00:00:00");
+    var n = new Date(todayKey()+"T00:00:00");
+    var days = Math.floor((n-s)/86400000);
+    if(isNaN(days) || days<0) days = 0;
+    var w = Math.min(12, Math.floor(days/7)+1);
+    var d = Math.min(6, (days%7)+1);
+    return {w:w, d:d};
+  }
+  function cell(w,d){ return "W"+w+"D"+d; }
+  function countDone(){ var n=0; for(var k in state.done){ if(state.done[k]) n++; } return n; }
+  function weekCount(w){ var n=0; for(var i=1;i<=6;i++){ if(state.done[cell(w,i)]) n++; } return n; }
+
+  /* ---------- rendering ---------- */
+  var pos = position();
+
+  function renderToday(){
+    var wk = WEEKS[pos.w-1];
+    var warm = "<b>先暖身 3 分鐘：</b>20 條長直線（Monoline）· 20 個各角度橢圓 · 10 條 S 形曲線";
+    if(pos.w >= 7){
+      warm += "<br><b>人物支線：</b>暖身後加 D18 姿態速寫 30 秒 × " + (pos.w >= 10 ? "10" : "5")
+            + "（只畫動勢線，不畫臉與手指）";
+    }
+    document.getElementById("warmup").innerHTML = warm;
+    var key = cell(pos.w,pos.d);
+    document.getElementById("t-chip").textContent = "W"+pos.w+" D"+pos.d;
+    document.getElementById("t-week").textContent = wk.t.replace("　← 進步最有感","");
+    document.getElementById("t-task").textContent = wk.d[pos.d-1];
+    document.getElementById("t-meta").textContent = pos.d===6
+      ? "成果圖 · 40–60 分鐘"
+      : (pos.w>=7 ? "30 分鐘（暖身 3 ＋ 姿態速寫 3 ＋ 主課 17 ＋ 收尾 5）"
+                  : "25 分鐘（暖身 3 ＋ 主課 17 ＋ 收尾 5）");
+    var btn = document.getElementById("done-btn");
+    var done = !!state.done[key];
+    btn.setAttribute("aria-pressed", done ? "true" : "false");
+    btn.textContent = done ? "今天已完成 — 再點一次取消" : "今天練完了 ✓";
+    var input = document.getElementById("focus-input");
+    if(document.activeElement !== input) input.value = state.focus[key] || "";
+    document.getElementById("s-days").textContent = countDone();
+    document.getElementById("s-week").textContent = "W"+pos.w;
+    document.getElementById("s-streak").textContent = weekCount(pos.w);
+    document.getElementById("start-date").textContent = state.startDate;
+  }
+
+  function renderWeeks(){
+    var host = document.getElementById("weeks");
+    host.textContent = "";
+    var phase = "";
+    WEEKS.forEach(function(wk){
+      if(wk.phase !== phase){
+        phase = wk.phase;
+        var p = document.createElement("p");
+        p.className = "phase"; p.textContent = phase;
+        host.appendChild(p);
+      }
+      var row = document.createElement("div");
+      row.className = "wk" + (wk.n===pos.w ? " now" : "");
+      var n = document.createElement("span");
+      n.className = "wk-n"; n.textContent = "W"+wk.n;
+      var t = document.createElement("span");
+      t.className = "wk-t"; t.textContent = wk.t;
+      var dots = document.createElement("div");
+      dots.className = "dots";
+      for(var i=1;i<=6;i++){
+        (function(i){
+          var b = document.createElement("button");
+          var key = cell(wk.n,i);
+          b.className = "dot" + (wk.n===pos.w && i===pos.d ? " is-today" : "");
+          b.type = "button";
+          b.setAttribute("aria-pressed", state.done[key] ? "true" : "false");
+          b.setAttribute("aria-label", "W"+wk.n+" 第 "+i+" 天："+wk.d[i-1]);
+          b.title = "D"+i+"　"+wk.d[i-1];
+          b.addEventListener("click", function(){ toggle(key); });
+          dots.appendChild(b);
+        })(i);
+      }
+      row.appendChild(n); row.appendChild(t); row.appendChild(dots);
+      host.appendChild(row);
+    });
+  }
+
+  function renderStatic(){
+    var g = document.getElementById("ges");
+    GESTURES.forEach(function(p){
+      var w = document.createElement("div");
+      var dt = document.createElement("dt"); dt.textContent = p[0];
+      var dd = document.createElement("dd"); dd.textContent = p[1];
+      w.appendChild(dt); w.appendChild(dd); g.appendChild(w);
+    });
+
+    var sc = document.getElementById("scale");
+    [["#ffffff","1 白"],["#bfbfbf","2"],["#808080","3 中灰"],["#404040","4"],["#000000","5 黑"]]
+      .forEach(function(p,i){
+        var s = document.createElement("span");
+        s.style.background = p[0];
+        s.style.color = i>2 ? "#e8e8e8" : "#2a2a2a";
+        s.textContent = p[1];
+        sc.appendChild(s);
+      });
+
+    var dh = document.getElementById("drills");
+    var box = document.createElement("details");
+    var sum = document.createElement("summary"); sum.textContent = "展開 20 個練習";
+    box.appendChild(sum);
+    DRILLS.forEach(function(d){
+      var row = document.createElement("div"); row.className = "drill";
+      var c = document.createElement("code"); c.textContent = d[0];
+      var body = document.createElement("div");
+      var name = document.createElement("span"); name.textContent = d[1];
+      var em = document.createElement("em"); em.textContent = d[2];
+      body.appendChild(name); body.appendChild(em);
+      row.appendChild(c); row.appendChild(body);
+      box.appendChild(row);
+    });
+    dh.appendChild(box);
+
+    var fh = document.getElementById("fix");
+    FIXES.forEach(function(f){
+      var d = document.createElement("details");
+      var s = document.createElement("summary"); s.textContent = f[0];
+      var p = document.createElement("p"); p.textContent = f[1];
+      d.appendChild(s); d.appendChild(p); fh.appendChild(d);
+    });
+  }
+
+  /* ---------- persistence ---------- */
+  function save(){
+    try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){}
+    if(docRef){
+      docRef.set({startDate:state.startDate, done:state.done, focus:state.focus})
+        .catch(function(){ flag("雲端未同步，本機已存"); });
+    }
+  }
+  function toggle(key){
+    state.done[key] = !state.done[key];
+    if(!state.done[key]) delete state.done[key];
+    save(); renderWeeks(); renderToday();
+  }
+  function flag(text){ document.getElementById("sync").textContent = text; }
+
+  try{
+    var raw = localStorage.getItem(LS);
+    if(raw){
+      var parsed = JSON.parse(raw);
+      state.startDate = parsed.startDate || START;
+      state.done = parsed.done || {};
+      state.focus = parsed.focus || {};
+    }
+  }catch(e){}
+
+  pos = position();
+  renderStatic(); renderWeeks(); renderToday();
+
+  document.getElementById("done-btn").addEventListener("click", function(){
+    toggle(cell(pos.w,pos.d));
+  });
+  var fi = document.getElementById("focus-input");
+  var t;
+  fi.addEventListener("input", function(){
+    clearTimeout(t);
+    var key = cell(pos.w,pos.d), v = fi.value;
+    t = setTimeout(function(){ state.focus[key] = v; save(); }, 600);
+  });
+
+  /* cross-device sync: iPad 打的勾，iPhone 也看得到 */
+  if(window.claude && typeof window.claude.use === "function"){
+    window.claude.use("db").then(function(api){
+      if(!api) return;
+      db = api;
+      docRef = db.doc("progress/main");
+      flag("雲端同步中");
+      docRef.onSnapshot(function(snap){
+        var d = (snap && snap.exists) ? snap.data() : null;
+        if(!d){
+          if(countDone() || Object.keys(state.focus).length) save();
+          flag("雲端同步中");
+          return;
+        }
+        state.startDate = d.startDate || state.startDate;
+        state.done = d.done || state.done;
+        state.focus = d.focus || state.focus;
+        try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){}
+        pos = position();
+        renderWeeks(); renderToday();
+        flag("已同步 · " + new Date().toLocaleTimeString("zh-TW",{hour:"2-digit",minute:"2-digit"}));
+      }, function(){ flag("本機儲存"); });
+    }).catch(function(){});
+  }
+})();
+</script>

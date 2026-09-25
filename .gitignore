@@ -1,0 +1,8 @@
+.DS_Store
+Thumbs.db
+
+# Procreate 原始檔很大（單張常常 50–300MB），不要進 git。
+# 原始檔請照 00-setup.md 的規則備份到 iCloud Drive，
+# 這裡只放匯出的 JPEG/PNG 小圖當作進度紀錄。
+*.procreate
+*.brushset
