@@ -286,9 +286,10 @@
     ["斷了幾天不想回來","不用補課，直接從當天進度接回去。連續性是指習慣，不是紀錄"]
   ];
 
-  var START = "2026-09-14";
+  var START = "2026-09-26";  // W1 D1
   var LS = "procreate-tracker-v1";
-  var state = {startDate:START, done:{}, focus:{}};
+  var START_V = 2;   // 起算日改版時 +1，蓋掉裝置上存的舊日期
+  var state = {v:2, startDate:START, done:{}, focus:{}};
   var db = null, docRef = null;
 
   function todayKey(){
@@ -299,10 +300,11 @@
     var s = new Date(state.startDate+"T00:00:00");
     var n = new Date(todayKey()+"T00:00:00");
     var days = Math.floor((n-s)/86400000);
+    var notYet = days < 0;
     if(isNaN(days) || days<0) days = 0;
     var w = Math.min(12, Math.floor(days/7)+1);
     var d = Math.min(6, (days%7)+1);
-    return {w:w, d:d};
+    return {w:w, d:d, notYet:notYet};
   }
   function cell(w,d){ return "W"+w+"D"+d; }
   function countDone(){ var n=0; for(var k in state.done){ if(state.done[k]) n++; } return n; }
@@ -320,7 +322,7 @@
     }
     document.getElementById("warmup").innerHTML = warm;
     var key = cell(pos.w,pos.d);
-    document.getElementById("t-chip").textContent = "W"+pos.w+" D"+pos.d;
+    document.getElementById("t-chip").textContent = pos.notYet ? "明天開始" : ("W"+pos.w+" D"+pos.d);
     document.getElementById("t-week").textContent = wk.t.replace("　← 進步最有感","");
     document.getElementById("t-task").textContent = wk.d[pos.d-1];
     document.getElementById("t-meta").textContent = pos.d===6
@@ -422,9 +424,10 @@
 
   /* ---------- persistence ---------- */
   function save(){
+    state.v = START_V;
     try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){}
     if(docRef){
-      docRef.set({startDate:state.startDate, done:state.done, focus:state.focus})
+      docRef.set({v:START_V, startDate:state.startDate, done:state.done, focus:state.focus})
         .catch(function(){ flag("雲端未同步，本機已存"); });
     }
   }
@@ -439,7 +442,7 @@
     var raw = localStorage.getItem(LS);
     if(raw){
       var parsed = JSON.parse(raw);
-      state.startDate = parsed.startDate || START;
+      state.startDate = (parsed.v === START_V && parsed.startDate) ? parsed.startDate : START;
       state.done = parsed.done || {};
       state.focus = parsed.focus || {};
     }
@@ -473,7 +476,7 @@
           flag("雲端同步中");
           return;
         }
-        state.startDate = d.startDate || state.startDate;
+        state.startDate = (d.v === START_V && d.startDate) ? d.startDate : START;
         state.done = d.done || state.done;
         state.focus = d.focus || state.focus;
         try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){}
